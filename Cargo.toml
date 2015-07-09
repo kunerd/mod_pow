@@ -1,0 +1,7 @@
+[package]
+name = "mod_pow"
+version = "0.1.0"
+authors = ["Hendrik Kunert <qkunerd@gmail.com>"]
+
+[dependencies]
+num = "0.1"
