@@ -1,23 +1,24 @@
 extern crate num;
 
-use num::traits::{ Zero, One, FromPrimitive, ToPrimitive };
-use num::bigint::BigInt;
+use num::traits::{ Zero, One, FromPrimitive, ToPrimitive, Unsigned };
+use num::bigint::{ BigInt, BigUint, Sign };
 
 const DEFAULT_BUCKET_SIZE: usize = 5;
 
-pub trait ModPow<T> {
-    fn mod_pow(&self, exp: &T, m: &T) -> T;
-    fn mod_pow_k(&self, exp: &T, m: &T, k: usize) -> T;
+pub trait ModPow<T, K: Unsigned> {
+    fn mod_pow(&self, exp: &T, m: &K) -> Self;
+    fn mod_pow_k(&self, exp: &T, m: &K, k: usize) -> Self;
 }
 
-impl ModPow<BigInt> for BigInt {
+impl ModPow<BigInt, BigUint> for BigInt {
 
-    fn mod_pow(&self, exp: &BigInt, m: &BigInt) -> BigInt {
+    fn mod_pow(&self, exp: &BigInt, m: &BigUint) -> BigInt {
         self.mod_pow_k(exp, m, DEFAULT_BUCKET_SIZE)
     }
 
-    fn mod_pow_k(&self, exp: &BigInt, m: &BigInt, k: usize) -> BigInt {
+    fn mod_pow_k(&self, exp: &BigInt, m: &BigUint, k: usize) -> BigInt {
 
+        let signed_m = &BigInt::from_biguint(Sign::Plus, m.clone());
         let base = 2 << (k - 1);
 
         let mut table = Vec::with_capacity(base);
@@ -26,18 +27,18 @@ impl ModPow<BigInt> for BigInt {
         for i in 1..base {
             let last = table.get_mut(i-1).unwrap().clone();
 
-            table.push((last * self) % m);
+            table.push((last * self) % signed_m);
         }
 
         let mut r = BigInt::one();
 
         for i in digits_of_n(exp, base).iter().rev() {
             for _ in 0..k {
-                r = &r * &r % m
+                r = &r * &r % signed_m
             }
 
             if *i != 0 {
-                r = &r * table.get(*i).unwrap() % m;
+                r = &r * table.get(*i).unwrap() % signed_m;
             }
         }
 
