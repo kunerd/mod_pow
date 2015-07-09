@@ -2,6 +2,13 @@
 name = "mod_pow"
 version = "0.1.0"
 authors = ["Hendrik Kunert <qkunerd@gmail.com>"]
+license = "MIT"
+homepage = "https://github.com/kunerd/mod_pow"
+repository = "https://github.com/kunerd/mod_pow"
+keywords = ["mathematics", "numerics", "exponentiation", "pow", "mod_pow"]
+description = """
+Extension crate for fast modular exponentiation.
+"""
 
 [dependencies]
 num = "0.1"
